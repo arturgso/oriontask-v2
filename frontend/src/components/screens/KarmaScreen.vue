@@ -27,25 +27,36 @@ const emit = defineEmits(['openNewKarmaModal']);
 </script>
 
 <template>
-  <div class="screen">
-    <div class="flex justify-between items-center mb-4">
-      <h1>Karma</h1>
-      <button class="btn btn-primary" @click="emit('openNewKarmaModal')">
-        <Plus :size="16"/> Log Karma
-      </button>
-    </div>
+  <div class="pt-[80px] flex flex-col mb-20 w-full">
+    <!-- Header -->
+    <header class="flex justify-between items-start mb-12">
+      <div>
+        <h1 class="font-serif text-[32px] mb-1 font-normal text-text-primary opacity-90 tracking-[-0.01em]">Karma</h1>
+        <p class="text-text-secondary opacity-70 text-sm">Track your habits and behaviors.</p>
+      </div>
+      <div class="flex pt-2">
+        <button class="flex items-center gap-1.5 bg-[#c68e3e] border-none px-3 py-1.5 rounded-md text-white text-[13px] font-medium hover:brightness-110 transition-all cursor-pointer" @click="emit('openNewKarmaModal')">
+          <Plus :size="14" />
+          <span>Log Karma</span>
+        </button>
+      </div>
+    </header>
     
-    <div class="karma-log">
-      <div v-for="(entries, dateStr) in groupedKarma" :key="dateStr" class="date-group">
-        <h3 class="date-header">{{ dateStr }}</h3>
+    <div v-if="Object.keys(groupedKarma).length === 0" class="py-10 text-text-secondary text-left">
+      <p>No karma logged yet.</p>
+    </div>
+
+    <div class="flex flex-col">
+      <div v-for="(entries, dateStr) in groupedKarma" :key="dateStr" class="mb-10">
+        <h3 class="text-[11px] font-semibold text-text-secondary opacity-60 uppercase tracking-widest mb-4 border-b border-border/50 pb-2">{{ dateStr }}</h3>
         
-        <div class="entries">
-          <div v-for="entry in entries" :key="entry.id" class="entry-item card flex items-center gap-4">
-            <div class="entry-icon">
-              <PlusCircle v-if="entry.type === 'positive'" class="text-positive" :size="20"/>
-              <MinusCircle v-if="entry.type === 'negative'" class="text-negative" :size="20"/>
+        <div class="flex flex-col">
+          <div v-for="entry in entries" :key="entry.id" class="flex items-center gap-4 py-4 border-b border-border/50 transition-all duration-200 first:border-t-0 hover:bg-surface/10 px-2 rounded-md">
+            <div class="shrink-0">
+              <PlusCircle v-if="entry.type === 'positive'" class="text-success opacity-80" :size="20" :stroke-width="1.5"/>
+              <MinusCircle v-if="entry.type === 'negative'" class="text-danger opacity-80" :size="20" :stroke-width="1.5"/>
             </div>
-            <div class="entry-desc">
+            <div class="text-[15px] text-text-primary tracking-[-0.01em]">
               {{ entry.description }}
             </div>
           </div>
@@ -54,35 +65,3 @@ const emit = defineEmits(['openNewKarmaModal']);
     </div>
   </div>
 </template>
-
-<style scoped>
-.screen {
-  padding: 40px;
-  max-width: 800px;
-  margin: 0 auto;
-}
-.date-group {
-  margin-bottom: 32px;
-}
-.date-header {
-  font-size: 14px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 12px;
-}
-.entries {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.entry-item {
-  padding: 16px;
-  margin-bottom: 0;
-}
-.text-positive { color: var(--success-color); }
-.text-negative { color: var(--danger-color); }
-.entry-desc {
-  font-size: 15px;
-}
-</style>

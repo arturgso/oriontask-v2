@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 @layer base {
+  @font-face {
+    font-family: 'Nunito';
+    src: url('./assets/fonts/nunito-v16-latin-regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
     --bg-color: #111111;
     --surface-color: #1e1e1e;
@@ -15,11 +23,12 @@
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 14px;
-    --font-sans: "Poppins", sans-serif;
+    --font-sans: "Nunito", sans-serif;
   }
 
   html, body {
     @apply bg-bg text-text-primary font-sans h-full w-full overflow-hidden;
+    color-scheme: dark;
   }
 
   #app {
@@ -69,7 +78,11 @@
   .form-group { @apply mb-4; }
   .form-group label { @apply block mb-1.5 text-[13px] text-text-secondary; }
   .form-control {
-    @apply w-full bg-surface border border-border text-text-primary px-3 py-[10px] rounded-sm font-sans text-[14px] outline-none transition-colors duration-200;
+    @apply w-full bg-surface border border-border text-text-primary px-3 py-[10px] rounded-sm font-sans text-[14px] outline-none transition-colors duration-200 appearance-none;
+  }
+  .form-control option {
+    background-color: var(--surface-color);
+    color: var(--text-primary);
   }
   .form-control:focus { @apply border-accent; }
 

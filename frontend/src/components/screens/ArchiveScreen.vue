@@ -34,67 +34,39 @@ const getProjectName = (projectId?: string) => {
 </script>
 
 <template>
-  <div class="screen">
-    <h1>Archive</h1>
+  <div class="pt-[80px] flex flex-col mb-20 w-full">
+    <!-- Header -->
+    <header class="flex justify-between items-start mb-12">
+      <div>
+        <h1 class="font-serif text-[32px] mb-1 font-normal text-text-primary opacity-90 tracking-[-0.01em]">Archive</h1>
+        <p class="text-text-secondary opacity-70 text-sm">Completed tasks.</p>
+      </div>
+    </header>
     
-    <div v-if="Object.keys(groupedTasks).length === 0" class="empty-state">
+    <div v-if="Object.keys(groupedTasks).length === 0" class="py-10 text-text-secondary text-left">
       <p>No completed tasks yet.</p>
     </div>
 
-    <div class="archive-list">
-      <div v-for="(tasks, dateStr) in groupedTasks" :key="dateStr" class="date-group">
-        <h3 class="date-header">{{ dateStr }}</h3>
+    <div class="flex flex-col">
+      <div v-for="(tasks, dateStr) in groupedTasks" :key="dateStr" class="mb-10">
+        <h3 class="text-[11px] font-semibold text-text-secondary opacity-60 uppercase tracking-widest mb-4 border-b border-border/50 pb-2">{{ dateStr }}</h3>
         
-        <div class="entries">
-          <div v-for="task in tasks" :key="task.id" class="task-item flex items-center gap-3">
-            <Check class="text-success" :size="16"/>
-            <span class="task-title">{{ task.title }}</span>
-            <span class="meta text-muted">
-              {{ getDharmaName(task.dharma_id) }}
-              <template v-if="task.project_id"> &middot; {{ getProjectName(task.project_id) }}</template>
-            </span>
+        <div class="flex flex-col">
+          <div v-for="task in tasks" :key="task.id" class="flex items-start gap-4 py-4 border-b border-border/50 transition-all duration-200 first:border-t-0 px-2 rounded-md">
+            <div class="shrink-0 mt-0.5">
+              <Check class="text-success opacity-80" :size="18" :stroke-width="2"/>
+            </div>
+            
+            <div class="flex-1 flex justify-between items-start gap-4">
+              <span class="text-[15px] text-text-primary tracking-[-0.01em]">{{ task.title }}</span>
+              <span class="text-[13px] text-text-secondary opacity-60 whitespace-nowrap text-right">
+                {{ getDharmaName(task.dharma_id) }}
+                <template v-if="task.project_id"> &middot; {{ getProjectName(task.project_id) }}</template>
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
-<style scoped>
-.screen {
-  padding: 40px;
-  max-width: 800px;
-  margin: 0 auto;
-}
-.date-group {
-  margin-bottom: 32px;
-}
-.date-header {
-  font-size: 14px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
-  padding-bottom: 8px;
-}
-.entries {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-.task-item {
-  padding: 8px 0;
-}
-.text-success { color: var(--success-color); }
-.task-title {
-  font-size: 15px;
-  color: var(--text-primary);
-}
-.meta {
-  font-size: 13px;
-  margin-left: auto;
-}
-.text-muted { color: var(--text-secondary); }
-.empty-state { text-align: center; color: var(--text-secondary); margin-top: 40px; }
-</style>

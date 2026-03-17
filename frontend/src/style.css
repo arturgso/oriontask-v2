@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-color: #111111;
+    --surface-color: #1e1e1e;
+    --surface-hover: #2a2a2a;
+    --text-primary: #f3f4f6;
+    --text-secondary: #9ca3af;
+    --accent-color: #3b82f6;
+    --accent-hover: #2563eb;
+    --danger-color: #ef4444;
+    --success-color: #10b981;
+    --border-color: #333333;
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --font-sans: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+    --font-serif: "Georgia", "Times New Roman", Times, serif;
+  }
+
+  html, body {
+    @apply bg-bg text-text-primary font-sans h-full w-full overflow-hidden;
+  }
+
+  #app {
+    @apply h-full w-full flex;
+  }
+
+  /* Typography */
+  h1 { 
+    @apply font-serif text-[32px] font-normal mb-[40px] tracking-[-0.01em];
+  }
+  h2 { @apply text-[18px] font-semibold mb-4 tracking-[-0.01em]; }
+  h3 { @apply text-[16px] font-medium mb-3; }
+  p { @apply text-[14px] text-text-secondary leading-relaxed; }
+}
+
+@theme {
+  --color-bg: var(--bg-color);
+  --color-surface: var(--surface-color);
+  --color-surface-hover: var(--surface-hover);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-accent: var(--accent-color);
+  --color-accent-hover: var(--accent-hover);
+  --color-danger: var(--danger-color);
+  --color-success: var(--success-color);
+  --color-border: var(--border-color);
+  
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif);
+  
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+}
+
+@layer components {
+  /* Buttons */
+  .btn {
+    @apply bg-surface text-text-primary border border-border px-4 py-2 rounded-sm cursor-pointer font-sans text-[14px] transition-all duration-200 inline-flex items-center gap-2;
+  }
+  .btn:hover { @apply bg-surface-hover; }
+  .btn-primary { @apply bg-accent text-white border-none; }
+  .btn-primary:hover { @apply bg-accent-hover; }
+  .btn-icon { @apply p-2 rounded-sm bg-transparent border-none text-text-secondary cursor-pointer hover:bg-surface hover:text-text-primary; }
+
+  /* Forms */
+  .form-group { @apply mb-4; }
+  .form-group label { @apply block mb-1.5 text-[13px] text-text-secondary; }
+  .form-control {
+    @apply w-full bg-surface border border-border text-text-primary px-3 py-[10px] rounded-sm font-sans text-[14px] outline-none transition-colors duration-200;
+  }
+  .form-control:focus { @apply border-accent; }
+
+  /* Cards */
+  .card {
+    @apply bg-surface rounded-md p-4 mb-3 border border-border;
+  }
+
+  /* Global Screen Layout */
+  .screen {
+    @apply w-full max-w-[640px] px-6 py-20 flex flex-col;
+  }
+
+  /* Modal Base */
+  .modal-overlay {
+    @apply fixed inset-0 bg-black/60 backdrop-blur-[2px] flex items-center justify-center z-[100];
+  }
+  .modal-content {
+    @apply bg-bg border border-border rounded-lg p-6 w-full max-w-[440px] shadow-[0_10px_30px_rgba(0,0,0,0.5)];
+  }
+  .modal-header { @apply mb-5 text-[18px] font-semibold; }
+  .modal-footer { @apply flex justify-end gap-3 mt-6; }
+}

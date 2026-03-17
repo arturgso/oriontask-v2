@@ -1,0 +1,84 @@
+classDiagram
+    %% Enums definidos para substituir strings genéricas
+    class TaskStatus {
+        <<enumeration>>
+        TODO
+        IN_PROGRESS
+        BLOCKED
+        COMPLETED
+        CANCELLED
+    }
+
+    class ProjectStatus {
+        <<enumeration>>
+        PLANNING
+        ACTIVE
+        ON_HOLD
+        COMPLETED
+    }
+
+    class MilestoneStatus {
+        <<enumeration>>
+        PENDING
+        IN_PROGRESS
+        ACHIEVED
+    }
+
+    class KarmaType {
+        <<enumeration>>
+        POSITIVE
+        NEGATIVE
+        NEUTRAL
+    }
+
+    %% Classes Principais
+    class Dharma {
+        UUID id
+        string name
+        string description
+        datetime createdAt
+    }
+
+    class Project {
+        UUID id
+        UUID dharmaId
+        string title
+        string description
+        ProjectStatus status
+        datetime createdAt
+    }
+
+    class Milestone {
+        UUID id
+        UUID projectId
+        string title
+        string description
+        MilestoneStatus status
+        datetime createdAt
+    }
+
+    class Task {
+        UUID id
+        UUID dharmaId
+        UUID projectId
+        UUID milestoneId
+        string title
+        string description
+        TaskStatus status
+        datetime createdAt
+        datetime completedAt
+    }
+
+    class KarmaEntry {
+        UUID id
+        KarmaType type
+        string description
+        datetime createdAt
+    }
+
+    %% Relacionamentos
+    Dharma "1" --> "*" Project
+    Project "1" --> "*" Milestone
+    Dharma "1" --> "*" Task
+    Project "0..1" --> "*" Task
+    Milestone "0..1" --> "*" Task

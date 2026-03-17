@@ -1,0 +1,224 @@
+classDiagram
+    %% Enums definidos para substituir strings genéricas
+    class TaskStatus {
+        <<enumeration>>
+        TODO
+        IN_PROGRESS
+        BLOCKED
+        COMPLETED
+        CANCELLED
+    }
+
+    class ProjectStatus {
+        <<enumeration>>
+        PLANNING
+        ACTIVE
+        ON_HOLD
+        COMPLETED
+    }
+
+    class MilestoneStatus {
+        <<enumeration>>
+        PENDING
+        IN_PROGRESS
+        ACHIEVED
+    }
+
+    class KarmaType {
+        <<enumeration>>
+        POSITIVE
+        NEGATIVE
+        NEUTRAL
+    }
+
+    %% Entidades de domínio
+    class Dharma {
+        UUID id
+        string name
+        string description
+        datetime createdAt
+    }
+
+    class Project {
+        UUID id
+        UUID dharmaId
+        string title
+        string description
+        ProjectStatus status
+        datetime createdAt
+    }
+
+    class Milestone {
+        UUID id
+        UUID projectId
+        string title
+        string description
+        MilestoneStatus status
+        datetime createdAt
+    }
+
+    class Task {
+        UUID id
+        UUID dharmaId
+        UUID projectId
+        UUID milestoneId
+        string title
+        string description
+        TaskStatus status
+        datetime createdAt
+        datetime completedAt
+    }
+
+    class KarmaEntry {
+        UUID id
+        KarmaType type
+        string description
+        datetime createdAt
+    }
+
+    %% Interfaces de repositório
+    class IDharmaRepository {
+        <<interface>>
+        +findById(id: UUID) Dharma
+        +findAll() Dharma[]
+        +save(dharma: Dharma) Dharma
+        +delete(id: UUID) void
+    }
+
+    class IProjectRepository {
+        <<interface>>
+        +findById(id: UUID) Project
+        +findByDharmaId(dharmaId: UUID) Project[]
+        +save(project: Project) Project
+        +delete(id: UUID) void
+    }
+
+    class IMilestoneRepository {
+        <<interface>>
+        +findById(id: UUID) Milestone
+        +findByProjectId(projectId: UUID) Milestone[]
+        +save(milestone: Milestone) Milestone
+        +delete(id: UUID) void
+    }
+
+    class ITaskRepository {
+        <<interface>>
+        +findById(id: UUID) Task
+        +findByDharmaId(dharmaId: UUID) Task[]
+        +findByProjectId(projectId: UUID) Task[]
+        +findByMilestoneId(milestoneId: UUID) Task[]
+        +save(task: Task) Task
+        +delete(id: UUID) void
+    }
+
+    class IKarmaEntryRepository {
+        <<interface>>
+        +findById(id: UUID) KarmaEntry
+        +findAll() KarmaEntry[]
+        +save(entry: KarmaEntry) KarmaEntry
+        +delete(id: UUID) void
+    }
+
+    %% Implementações de repositório
+    class DharmaRepository
+    class ProjectRepository
+    class MilestoneRepository
+    class TaskRepository
+    class KarmaEntryRepository
+
+    %% Interfaces de serviço
+    class IDharmaService {
+        <<interface>>
+        +create(name: string, description: string) Dharma
+        +getById(id: UUID) Dharma
+        +list() Dharma[]
+        +remove(id: UUID) void
+    }
+
+    class IProjectService {
+        <<interface>>
+        +create(dharmaId: UUID, title: string, description: string) Project
+        +getById(id: UUID) Project
+        +listByDharma(dharmaId: UUID) Project[]
+        +remove(id: UUID) void
+    }
+
+    class IMilestoneService {
+        <<interface>>
+        +create(projectId: UUID, title: string, description: string) Milestone
+        +getById(id: UUID) Milestone
+        +listByProject(projectId: UUID) Milestone[]
+        +remove(id: UUID) void
+    }
+
+    class ITaskService {
+        <<interface>>
+        +create(title: string, description: string) Task
+        +getById(id: UUID) Task
+        +listByDharma(dharmaId: UUID) Task[]
+        +listByProject(projectId: UUID) Task[]
+        +listByMilestone(milestoneId: UUID) Task[]
+        +complete(id: UUID) Task
+        +remove(id: UUID) void
+    }
+
+    class IKarmaEntryService {
+        <<interface>>
+        +register(type: KarmaType, description: string) KarmaEntry
+        +getById(id: UUID) KarmaEntry
+        +list() KarmaEntry[]
+        +remove(id: UUID) void
+    }
+
+    %% Implementações de serviço
+    class DharmaService
+    class ProjectService
+    class MilestoneService
+    class TaskService
+    class KarmaEntryService
+
+    %% Relacionamentos das entidades
+    Dharma "1" --> "*" Project
+    Project "1" --> "*" Milestone
+    Dharma "1" --> "*" Task
+    Project "0..1" --> "*" Task
+    Milestone "0..1" --> "*" Task
+
+    %% Relacionamentos repository -> entidades
+    IDharmaRepository --> Dharma
+    IProjectRepository --> Project
+    IMilestoneRepository --> Milestone
+    ITaskRepository --> Task
+    IKarmaEntryRepository --> KarmaEntry
+
+    DharmaRepository ..|> IDharmaRepository
+    ProjectRepository ..|> IProjectRepository
+    MilestoneRepository ..|> IMilestoneRepository
+    TaskRepository ..|> ITaskRepository
+    KarmaEntryRepository ..|> IKarmaEntryRepository
+
+    %% Relacionamentos service -> repository
+    IDharmaService --> IDharmaRepository
+    IProjectService --> IProjectRepository
+    IMilestoneService --> IMilestoneRepository
+    ITaskService --> ITaskRepository
+    IKarmaEntryService --> IKarmaEntryRepository
+
+    %% Relacionamentos service -> entidades
+    IDharmaService --> Dharma
+    IProjectService --> Project
+    IMilestoneService --> Milestone
+    ITaskService --> Task
+    IKarmaEntryService --> KarmaEntry
+
+    DharmaService ..|> IDharmaService
+    ProjectService ..|> IProjectService
+    MilestoneService ..|> IMilestoneService
+    TaskService ..|> ITaskService
+    KarmaEntryService ..|> IKarmaEntryService
+
+    DharmaService --> IDharmaRepository
+    ProjectService --> IProjectRepository
+    MilestoneService --> IMilestoneRepository
+    TaskService --> ITaskRepository
+    KarmaEntryService --> IKarmaEntryRepository

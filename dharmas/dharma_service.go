@@ -22,7 +22,7 @@ func (s *DharmaAppService) CreateDharma(name string) (*Dharmas, error) {
 	name = strings.TrimSpace(name)
 
 	if name == "" {
-		return nil, errors.New("O nome do Dharma não pode estar vazaio")
+		return nil, errors.New("O nome do Dharma não pode estar vazio")
 	}
 
 	if len(name) > 60 {

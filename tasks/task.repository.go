@@ -42,6 +42,12 @@ func (r *taskRepository) ListAll(ctx context.Context) ([]Task, error) {
 	return task, err
 }
 
+func (r *taskRepository) FindByDharmaID(ctx context.Context, dharmaID uuid.UUID) ([]Task, error) {
+	var tasks []Task
+	err := r.db.WithContext(ctx).Where("dharma_id = ?", dharmaID).Find(&tasks).Error
+	return tasks, err
+}
+
 func (r *taskRepository) Delete(ctx context.Context, id uuid.UUID) error {
 	return r.db.WithContext(ctx).Delete(&Task{}, "id = ?", id).Error
 }

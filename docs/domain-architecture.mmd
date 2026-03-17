@@ -105,8 +105,8 @@ classDiagram
         <<interface>>
         +findById(id: UUID) Task
         +findByDharmaId(dharmaId: UUID) Task[]
-        +findByProjectId(projectId: UUID) Task[]
-        +findByMilestoneId(milestoneId: UUID) Task[]
+        +findByProjectId(projectId: UUID) Task[] $TODO
+        +findByMilestoneId(milestoneId: UUID) Task[] $TODO
         +save(task: Task) Task
         +delete(id: UUID) void
     }
@@ -156,9 +156,9 @@ classDiagram
         +create(title: string, description: string) Task
         +getById(id: UUID) Task
         +listByDharma(dharmaId: UUID) Task[]
-        +listByProject(projectId: UUID) Task[]
-        +listByMilestone(milestoneId: UUID) Task[]
-        +complete(id: UUID) Task
+        +listByProject(projectId: UUID) Task[] $TODO
+        +listByMilestone(milestoneId: UUID) Task[] $TODO
+        +complete(id: UUID) Task $TODO
         +remove(id: UUID) void
     }
 

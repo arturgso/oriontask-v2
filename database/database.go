@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 	"oriontask-v2/dharmas"
-	"oriontask-v2/frontend/tasks"
+	"oriontask-v2/tasks"
 	"os"
 	"path/filepath"
 

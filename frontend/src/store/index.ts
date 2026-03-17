@@ -43,30 +43,28 @@ export interface KarmaEntry {
   created_at: string;
 }
 
-// Initial Mock Data (Except Dharmas)
+// Initial Data (Loaded from storage or empty)
 const dharmas: Dharma[] = [];
+const projects: Project[] = [];
+const milestones: Milestone[] = [];
 
-const projects: Project[] = [
-  { id: 'p1', dharma_id: 'd2', title: 'OrionTask', description: 'Productivity Application', created_at: new Date().toISOString() },
-];
+const LOCAL_STORAGE_TASKS_KEY = 'oriontask_tasks';
 
-const milestones: Milestone[] = [
-  { id: 'm1', project_id: 'p1', title: 'Simplification', description: 'Simplify application features', created_at: new Date().toISOString() },
-];
+const loadTasks = (): Task[] => {
+  const stored = localStorage.getItem(LOCAL_STORAGE_TASKS_KEY);
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {
+      console.error('Failed to parse tasks from localStorage', e);
+    }
+  }
+  return [];
+};
 
-const tasks: Task[] = [
-  { id: 't1', dharma_id: 'd1', title: 'Clean the kitchen', description: '', status: 'active', created_at: new Date().toISOString() },
-  { id: 't2', dharma_id: 'd2', project_id: 'p1', milestone_id: 'm1', title: 'Remove authentication module', description: '', status: 'active', created_at: new Date().toISOString() },
-  { id: 't3', dharma_id: 'd1', title: 'Meditate for 10 minutes', description: '', status: 'active', created_at: new Date().toISOString() },
-  { id: 't4', dharma_id: 'd2', project_id: 'p1', title: 'Design dark mode theme', description: '', status: 'active', created_at: new Date().toISOString() },
-  { id: 't5', dharma_id: 'd2', title: 'Reply to emails', description: '', status: 'active', created_at: new Date().toISOString() },
-  { id: 't6', dharma_id: 'd1', title: 'Read a book', description: '', status: 'active', created_at: new Date().toISOString() }, // Backlog
-];
+const tasks: Task[] = loadTasks();
 
-const karmaEntries: KarmaEntry[] = [
-  { id: 'k1', type: 'positive', description: 'Meditated', created_at: new Date().toISOString() },
-  { id: 'k2', type: 'negative', description: 'Procrastinated on project', created_at: new Date().toISOString() },
-];
+const karmaEntries: KarmaEntry[] = [];
 
 export const store = reactive({
   dharmas,
@@ -76,6 +74,9 @@ export const store = reactive({
   karmaEntries,
 
   // Actions
+  saveTasks() {
+    localStorage.setItem(LOCAL_STORAGE_TASKS_KEY, JSON.stringify(this.tasks));
+  },
   async loadDharmas() {
     try {
       const data = await ListAllDharmas();
@@ -89,24 +90,30 @@ export const store = reactive({
     }
   },
   addTask(taskData: Omit<Task, 'id' | 'created_at' | 'status'>) {
+    // TODO: Call backend TaskService.CreateTask()
     this.tasks.push({
       ...taskData,
       id: uuidv4(),
       status: 'active',
       created_at: new Date().toISOString(),
     });
+    this.saveTasks();
   },
   completeTask(taskId: string) {
+    // TODO: Call backend TaskService.CompleteTask()
     const task = this.tasks.find(t => t.id === taskId);
     if (task) {
       task.status = 'completed';
       task.completed_at = new Date().toISOString();
+      this.saveTasks();
     }
   },
   postponeTask(taskId: string) {
+    // TODO: Call backend TaskService.PostponeTask() (if applicable)
     const task = this.tasks.find(t => t.id === taskId);
     if (task) {
       task.status = 'postponed';
+      this.saveTasks();
     }
   },
   addKarma(entry: Omit<KarmaEntry, 'id' | 'created_at'>, dateStr: string) {

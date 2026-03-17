@@ -4,6 +4,7 @@ import (
 	"embed"
 	"oriontask-v2/database"
 	"oriontask-v2/dharmas"
+	"oriontask-v2/tasks"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -24,6 +25,9 @@ func main() {
 	dharmaRepo := dharmas.NewDharmaRepository(db)
 	dharma := dharmas.NewDharmaService(dharmaRepo)
 
+	tasksRepo := tasks.NewTaskRepository(db)
+	taskService := tasks.NewTaskService(tasksRepo)
+
 	// Create application with options
 	err = wails.Run(&options.App{
 		Title:     "Oriontask",
@@ -39,6 +43,7 @@ func main() {
 		Bind: []interface{}{
 			app,
 			dharma,
+			taskService,
 		},
 	})
 

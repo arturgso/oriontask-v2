@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import { store } from './store';
 import Sidebar from './components/Sidebar.vue';
 import NowScreen from './components/screens/NowScreen.vue';
 import ProjectsScreen from './components/screens/ProjectsScreen.vue';
@@ -8,11 +9,38 @@ import KarmaScreen from './components/screens/KarmaScreen.vue';
 import ArchiveScreen from './components/screens/ArchiveScreen.vue';
 import NewTaskModal from './components/modals/NewTaskModal.vue';
 import NewKarmaModal from './components/modals/NewKarmaModal.vue';
+import NewDharmaModal from './components/modals/NewDharmaModal.vue';
+import ConfirmModal from './components/modals/ConfirmModal.vue';
 import { Plus } from 'lucide-vue-next';
+
+onMounted(() => {
+  store.loadDharmas();
+});
 
 const currentScreen = ref('now');
 const isTaskModalOpen = ref(false);
 const isKarmaModalOpen = ref(false);
+const isDharmaModalOpen = ref(false);
+
+// Confirm Modal State
+const isConfirmModalOpen = ref(false);
+const confirmConfig = ref({
+  title: '',
+  message: '',
+  confirmLabel: '',
+  isDestructive: false,
+  onConfirm: () => {}
+});
+
+const openConfirm = (config: any) => {
+  confirmConfig.value = { ...config };
+  isConfirmModalOpen.value = true;
+};
+
+const handleConfirm = async () => {
+  await confirmConfig.value.onConfirm();
+  isConfirmModalOpen.value = false;
+};
 
 const screens: Record<string, any> = {
   now: NowScreen,
@@ -35,6 +63,8 @@ const currentComponent = computed(() => screens[currentScreen.value] || NowScree
           :is="currentComponent" 
           @openNewKarmaModal="isKarmaModalOpen = true"
           @openNewTaskModal="isTaskModalOpen = true"
+          @openNewDharmaModal="isDharmaModalOpen = true"
+          @openConfirm="openConfirm"
         />
       </div>
     </main>
@@ -52,5 +82,15 @@ const currentComponent = computed(() => screens[currentScreen.value] || NowScree
     <!-- Modals -->
     <NewTaskModal v-if="isTaskModalOpen" @close="isTaskModalOpen = false" />
     <NewKarmaModal v-if="isKarmaModalOpen" @close="isKarmaModalOpen = false" />
+    <NewDharmaModal v-if="isDharmaModalOpen" @close="isDharmaModalOpen = false" />
+    <ConfirmModal 
+      v-if="isConfirmModalOpen" 
+      :title="confirmConfig.title"
+      :message="confirmConfig.message"
+      :confirmLabel="confirmConfig.confirmLabel"
+      :isDestructive="confirmConfig.isDestructive"
+      @confirm="handleConfirm"
+      @close="isConfirmModalOpen = false" 
+    />
   </div>
 </template>

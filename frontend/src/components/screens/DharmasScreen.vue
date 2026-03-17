@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { store } from '../../store';
-import { Plus } from 'lucide-vue-next';
+import { Plus, Trash2 } from 'lucide-vue-next';
+
+const emit = defineEmits(['openNewDharmaModal', 'openConfirm']);
 
 const dharmasWithDetails = computed(() => {
   return store.dharmas.map(d => {
@@ -12,19 +14,43 @@ const dharmasWithDetails = computed(() => {
     }
   });
 });
+
+const handleNewDharma = () => {
+  emit('openNewDharmaModal');
+};
+
+const handleDeleteDharma = (id: string, name: string) => {
+  emit('openConfirm', {
+    title: 'Delete Dharma',
+    message: `Are you sure you want to delete "${name}"? This action cannot be undone.`,
+    confirmLabel: 'Delete',
+    isDestructive: true,
+    onConfirm: async () => {
+      await store.deleteDharma(id);
+    }
+  });
+};
 </script>
 
 <template>
   <div class="screen">
     <div class="flex justify-between items-center mb-4">
       <h1>Dharmas</h1>
-      <button class="btn btn-primary"><Plus :size="16"/> New Dharma</button>
+      <button class="btn btn-primary" @click="handleNewDharma"><Plus :size="16"/> New Dharma</button>
     </div>
     
     <div class="dharma-grid">
-      <div v-for="dharma in dharmasWithDetails" :key="dharma.id" class="card dharma-card">
-        <h3>{{ dharma.name }}</h3>
-        <p class="desc">{{ dharma.description || 'No description' }}</p>
+      <div v-for="dharma in dharmasWithDetails" :key="dharma.id" class="card dharma-card relative group">
+        <div class="flex justify-between items-start">
+          <h3>{{ dharma.name }}</h3>
+          <button 
+            @click="handleDeleteDharma(dharma.id, dharma.name)"
+            class="text-red-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-transparent border-none cursor-pointer p-1"
+            title="Delete Dharma"
+          >
+            <Trash2 :size="16"/>
+          </button>
+        </div>
         
         <div class="stats mt-4">
           <div class="stat-item">
@@ -53,9 +79,7 @@ const dharmasWithDetails = computed(() => {
 }
 .dharma-card h3 {
   color: var(--accent-color);
-}
-.desc {
-  flex-grow: 1;
+  margin-top: 0;
 }
 .stats {
   display: flex;

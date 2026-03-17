@@ -8,5 +8,6 @@ pkgs.mkShell {
     pkgs.webkitgtk_4_1
     pkgs.gtk3
     pkgs.glib
+    pkgs.sqlite
   ];
 }

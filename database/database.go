@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"oriontask-v2/dharmas"
 	"os"
 	"path/filepath"
 
@@ -24,9 +25,9 @@ func Connect(appName string) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	// if err := db.AutoMigrate(&models.User{}); err != nil {
-	// 	return nil, err
-	// }
+	if err := db.AutoMigrate(&dharmas.Dharmas{}); err != nil {
+		return nil, err
+	}
 
 	return db, nil
 }

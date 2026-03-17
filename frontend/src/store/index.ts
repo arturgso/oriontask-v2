@@ -1,10 +1,10 @@
 import { reactive } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
+import { CreateDharma, ListAllDharmas, DeleteDharma } from '../../wailsjs/go/dharmas/DharmaAppService';
 
 export interface Dharma {
   id: string;
   name: string;
-  description: string;
   created_at: string;
 }
 
@@ -43,11 +43,8 @@ export interface KarmaEntry {
   created_at: string;
 }
 
-// Initial Mock Data
-const dharmas: Dharma[] = [
-  { id: 'd1', name: 'Daily Flow', description: 'Routines and habits', created_at: new Date().toISOString() },
-  { id: 'd2', name: 'Work', description: 'Professional tasks and projects', created_at: new Date().toISOString() },
-];
+// Initial Mock Data (Except Dharmas)
+const dharmas: Dharma[] = [];
 
 const projects: Project[] = [
   { id: 'p1', dharma_id: 'd2', title: 'OrionTask', description: 'Productivity Application', created_at: new Date().toISOString() },
@@ -79,6 +76,18 @@ export const store = reactive({
   karmaEntries,
 
   // Actions
+  async loadDharmas() {
+    try {
+      const data = await ListAllDharmas();
+      this.dharmas = data.map(d => ({
+        id: d.id as unknown as string,
+        name: d.name,
+        created_at: d.created_at as unknown as string,
+      }));
+    } catch (e) {
+      console.error("Failed to load dharmas:", e);
+    }
+  },
   addTask(taskData: Omit<Task, 'id' | 'created_at' | 'status'>) {
     this.tasks.push({
       ...taskData,
@@ -107,13 +116,28 @@ export const store = reactive({
       created_at: dateStr || new Date().toISOString(),
     });
   },
-  addDharma(name: string, description: string) {
-    this.dharmas.push({
-      id: uuidv4(),
-      name,
-      description,
-      created_at: new Date().toISOString(),
-    });
+  async addDharma(name: string) {
+    try {
+      const result = await CreateDharma(name);
+      this.dharmas.push({
+        id: result.id as unknown as string,
+        name: result.name,
+        created_at: result.created_at as unknown as string,
+      });
+    } catch (e) {
+      console.error("Failed to create dharma:", e);
+      throw e;
+    }
+  },
+  async deleteDharma(id: string) {
+    try {
+      // The API expects a uuid string mapped to number array or simply the string depending on bindings
+      await DeleteDharma(id as any);
+      this.dharmas = this.dharmas.filter(d => d.id !== id);
+    } catch (e) {
+      console.error("Failed to delete dharma:", e);
+      throw e;
+    }
   },
   addProject(dharma_id: string, title: string, description: string = '') {
     this.projects.push({

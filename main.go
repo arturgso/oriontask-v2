@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"oriontask-v2/database"
+	"oriontask-v2/dharmas"
 
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
@@ -15,16 +16,21 @@ func main() {
 	// Create an instance of the app structure
 	app := NewApp()
 
-	_, err := database.Connect("oriontask")
+	db, err := database.Connect("oriontask")
 	if err != nil {
 		panic(err)
 	}
 
+	dharmaRepo := dharmas.NewDharmaRepository(db)
+	dharma := dharmas.NewDharmaService(dharmaRepo)
+
 	// Create application with options
 	err = wails.Run(&options.App{
-		Title:  "Oriontask",
-		Width:  1024,
-		Height: 768,
+		Title:     "Oriontask",
+		Width:     1024,
+		Height:    768,
+		MinWidth:  800,
+		MinHeight: 600,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
@@ -32,6 +38,7 @@ func main() {
 		OnStartup:        app.startup,
 		Bind: []interface{}{
 			app,
+			dharma,
 		},
 	})
 

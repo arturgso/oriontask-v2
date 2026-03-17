@@ -15,8 +15,7 @@
     --radius-sm: 6px;
     --radius-md: 10px;
     --radius-lg: 14px;
-    --font-sans: "Nunito", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-    --font-serif: "Georgia", "Times New Roman", Times, serif;
+    --font-sans: "Poppins", sans-serif;
   }
 
   html, body {
@@ -29,7 +28,7 @@
 
   /* Typography */
   h1 { 
-    @apply font-serif text-[32px] font-normal mb-[40px] tracking-[-0.01em];
+    @apply font-sans text-[32px] font-semibold mb-[40px] tracking-[-0.01em];
   }
   h2 { @apply text-[18px] font-semibold mb-4 tracking-[-0.01em]; }
   h3 { @apply text-[16px] font-medium mb-3; }

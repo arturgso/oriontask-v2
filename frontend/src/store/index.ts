@@ -1,6 +1,7 @@
 import { reactive } from 'vue';
 import { v4 as uuidv4 } from 'uuid';
 import { CreateDharma, ListAllDharmas, DeleteDharma } from '../../wailsjs/go/dharmas/DharmaAppService';
+import { CompleteTask, CreateTask, FindTasksByDharmaID, DeleteTask } from '../../wailsjs/go/tasks/TaskService';
 
 export interface Dharma {
   id: string;
@@ -43,27 +44,11 @@ export interface KarmaEntry {
   created_at: string;
 }
 
-// Initial Data (Loaded from storage or empty)
+// Initial Data
 const dharmas: Dharma[] = [];
 const projects: Project[] = [];
 const milestones: Milestone[] = [];
-
-const LOCAL_STORAGE_TASKS_KEY = 'oriontask_tasks';
-
-const loadTasks = (): Task[] => {
-  const stored = localStorage.getItem(LOCAL_STORAGE_TASKS_KEY);
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch (e) {
-      console.error('Failed to parse tasks from localStorage', e);
-    }
-  }
-  return [];
-};
-
-const tasks: Task[] = loadTasks();
-
+const tasks: Task[] = [];
 const karmaEntries: KarmaEntry[] = [];
 
 export const store = reactive({
@@ -74,9 +59,6 @@ export const store = reactive({
   karmaEntries,
 
   // Actions
-  saveTasks() {
-    localStorage.setItem(LOCAL_STORAGE_TASKS_KEY, JSON.stringify(this.tasks));
-  },
   async loadDharmas() {
     try {
       const data = await ListAllDharmas();
@@ -85,27 +67,56 @@ export const store = reactive({
         name: d.name,
         created_at: d.created_at as unknown as string,
       }));
+
+      // Load tasks for each dharma
+      this.tasks = [];
+      for (const dharma of this.dharmas) {
+        const dharmaTasks = await FindTasksByDharmaID(dharma.id as any);
+        this.tasks.push(...dharmaTasks.map(t => ({
+          id: t.id as unknown as string,
+          dharma_id: t.dharmaId as unknown as string,
+          title: t.title,
+          description: t.description,
+          status: (t.status === 'COMPLETED' || t.completedAt ? 'completed' : 'active') as 'active' | 'completed' | 'postponed',
+          created_at: t.createdAt as unknown as string,
+          completed_at: t.completedAt as unknown as string,
+        })));
+      }
     } catch (e) {
-      console.error("Failed to load dharmas:", e);
+      console.error("Failed to load dharmas or tasks:", e);
     }
   },
-  addTask(taskData: Omit<Task, 'id' | 'created_at' | 'status'>) {
-    // TODO: Call backend TaskService.CreateTask()
-    this.tasks.push({
-      ...taskData,
-      id: uuidv4(),
-      status: 'active',
-      created_at: new Date().toISOString(),
-    });
-    this.saveTasks();
+  async addTask(taskData: Omit<Task, 'id' | 'created_at' | 'status'>) {
+    try {
+      const result = await CreateTask({
+        title: taskData.title,
+        description: taskData.description,
+        dharmaId: taskData.dharma_id as any,
+        status: 'TODO',
+      } as any);
+
+      this.tasks.push({
+        id: result.id as unknown as string,
+        dharma_id: result.dharmaId as unknown as string,
+        title: result.title,
+        description: result.description,
+        status: 'active',
+        created_at: result.createdAt as unknown as string,
+      });
+    } catch (e) {
+      console.error("Failed to create task:", e);
+    }
   },
-  completeTask(taskId: string) {
-    // TODO: Call backend TaskService.CompleteTask()
-    const task = this.tasks.find(t => t.id === taskId);
-    if (task) {
-      task.status = 'completed';
-      task.completed_at = new Date().toISOString();
-      this.saveTasks();
+  async completeTask(taskId: string) {
+    try {
+      const result = await CompleteTask(taskId as any);
+      const task = this.tasks.find(t => t.id === taskId);
+      if (task) {
+        task.status = 'completed';
+        task.completed_at = result.completedAt as unknown as string;
+      }
+    } catch (e) {
+      console.error("Failed to complete task:", e);
     }
   },
   postponeTask(taskId: string) {
@@ -113,7 +124,6 @@ export const store = reactive({
     const task = this.tasks.find(t => t.id === taskId);
     if (task) {
       task.status = 'postponed';
-      this.saveTasks();
     }
   },
   addKarma(entry: Omit<KarmaEntry, 'id' | 'created_at'>, dateStr: string) {
@@ -126,11 +136,12 @@ export const store = reactive({
   async addDharma(name: string) {
     try {
       const result = await CreateDharma(name);
-      this.dharmas.push({
+      const newDharma = {
         id: result.id as unknown as string,
         name: result.name,
         created_at: result.created_at as unknown as string,
-      });
+      };
+      this.dharmas.push(newDharma);
     } catch (e) {
       console.error("Failed to create dharma:", e);
       throw e;
@@ -138,9 +149,9 @@ export const store = reactive({
   },
   async deleteDharma(id: string) {
     try {
-      // The API expects a uuid string mapped to number array or simply the string depending on bindings
       await DeleteDharma(id as any);
       this.dharmas = this.dharmas.filter(d => d.id !== id);
+      this.tasks = this.tasks.filter(t => t.dharma_id !== id);
     } catch (e) {
       console.error("Failed to delete dharma:", e);
       throw e;
@@ -165,3 +176,4 @@ export const store = reactive({
     });
   }
 });
+

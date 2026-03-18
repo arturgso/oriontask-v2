@@ -22,6 +22,10 @@ func (r *taskRepository) Save(ctx context.Context, task *Task) error {
 	return r.db.WithContext(ctx).Create(task).Error
 }
 
+func (r *taskRepository) Update(ctx context.Context, task *Task) error {
+	return r.db.WithContext(ctx).Save(task).Error
+}
+
 func (r *taskRepository) FindByID(ctx context.Context, id uuid.UUID) (*Task, error) {
 	var task Task
 

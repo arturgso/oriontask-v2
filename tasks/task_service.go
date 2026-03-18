@@ -11,6 +11,7 @@ import (
 
 type TaskRepository interface {
 	Save(ctx context.Context, task *Task) error
+	Update(ctx context.Context, task *Task) error
 	// TODO: FindByProjectID(ctx context.Context, projectID uuid.UUID) ([]Task, error)
 	// TODO: FindByMilestoneID(ctx context.Context, milestoneID uuid.UUID) ([]Task, error)
 	FindByID(ctx context.Context, id uuid.UUID) (*Task, error)
@@ -65,7 +66,7 @@ func (s *TaskService) FindTasksByDharmaID(id uuid.UUID) ([]Task, error) {
 
 // TODO: func (s *TaskService) FindTasksByProjectID(projectID uuid.UUID) ([]Task, error) { ... }
 // TODO: func (s *TaskService) FindTasksByMilestoneID(milestoneID uuid.UUID) ([]Task, error) { ... }
-// TODO: func (s *TaskService) CompleteTask(id uuid.UUID) (*Task, error) { ... }
+
 func (s *TaskService) CompleteTask(id uuid.UUID) (*Task, error) {
 	if id == uuid.Nil {
 		return nil, errors.New("ID inválido fornecido")
@@ -82,8 +83,9 @@ func (s *TaskService) CompleteTask(id uuid.UUID) (*Task, error) {
 
 	now := time.Now()
 	task.CompletedAt = &now
+	task.Status = "COMPLETED"
 
-	if err := s.repo.Save(context.Background(), task); err != nil {
+	if err := s.repo.Update(context.Background(), task); err != nil {
 		return nil, err
 	}
 

@@ -47,6 +47,8 @@ export namespace tasks {
 	    description: string;
 	    status: string;
 	    // Go type: time
+	    completedAt?: any;
+	    // Go type: time
 	    createdAt: any;
 	    // Go type: time
 	    updatedAt: any;
@@ -62,6 +64,7 @@ export namespace tasks {
 	        this.title = source["title"];
 	        this.description = source["description"];
 	        this.status = source["status"];
+	        this.completedAt = this.convertValues(source["completedAt"], null);
 	        this.createdAt = this.convertValues(source["createdAt"], null);
 	        this.updatedAt = this.convertValues(source["updatedAt"], null);
 	    }

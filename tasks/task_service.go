@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/google/uuid"
 )
@@ -65,6 +66,30 @@ func (s *TaskService) FindTasksByDharmaID(id uuid.UUID) ([]Task, error) {
 // TODO: func (s *TaskService) FindTasksByProjectID(projectID uuid.UUID) ([]Task, error) { ... }
 // TODO: func (s *TaskService) FindTasksByMilestoneID(milestoneID uuid.UUID) ([]Task, error) { ... }
 // TODO: func (s *TaskService) CompleteTask(id uuid.UUID) (*Task, error) { ... }
+func (s *TaskService) CompleteTask(id uuid.UUID) (*Task, error) {
+	if id == uuid.Nil {
+		return nil, errors.New("ID inválido fornecido")
+	}
+
+	task, err := s.repo.FindByID(context.Background(), id)
+	if err != nil {
+		return nil, errors.New("Task não encontrada")
+	}
+
+	if task.CompletedAt != nil {
+		return nil, errors.New("Task já marcada como concluída")
+	}
+
+	now := time.Now()
+	task.CompletedAt = &now
+
+	if err := s.repo.Save(context.Background(), task); err != nil {
+		return nil, err
+	}
+
+	return task, nil
+}
+
 // TODO: func (s *TaskService) PostponeTask(id uuid.UUID) (*Task, error) { ... }
 
 func (s *TaskService) DeleteTask(id uuid.UUID) error {

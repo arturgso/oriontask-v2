@@ -24,6 +24,7 @@ type Task struct {
 	Title       string           `gorm:"type:varchar(100);not null" json:"title"`
 	Description string           `gorm:"type:text;" json:"description"`
 	Status      TaskStatus       `gorm:"type:varchar(20);not null;default:'TODO'" json:"status"`
+	CompletedAt *time.Time       `gorm:"type:timestamp" json:"completedAt"`
 	CreatedAt   time.Time        `gorm:"type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"createdAt"`
 	UpdatedAt   time.Time        `gorm:"type:timestamp;not null;default:CURRENT_TIMESTAMP" json:"updatedAt"`
 }
